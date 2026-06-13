@@ -1,0 +1,13 @@
+version: v2
+modules:
+  - path: proto
+lint:
+  use:
+    - STANDARD
+  except:
+    # No API versioning in this test service: proto lives at proto/orders
+    # without a version suffix, so the package is "orders" (not "orders.v1").
+    - PACKAGE_VERSION_SUFFIX
+breaking:
+  use:
+    - FILE

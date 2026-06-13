@@ -1,0 +1,39 @@
+exclude: ^(bin/)
+default_stages: [ pre-commit ]
+repos:
+  - repo: https://github.com/jorisroovers/gitlint
+    rev: v0.19.1
+    hooks:
+      - id: gitlint
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-yaml
+      - id: check-toml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+
+  - repo: local
+    hooks:
+      - id: go-fmt
+        name: go-fmt
+        entry: go fmt ./...
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: go-vet
+        name: go-vet
+        entry: go vet ./...
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: go-test
+        name: go-test
+        entry: go test -race -v ./...
+        language: system
+        pass_filenames: false
+        always_run: true
