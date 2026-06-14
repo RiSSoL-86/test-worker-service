@@ -13,11 +13,14 @@ const (
 const (
 	topic         = "orders"
 	consumerGroup = "orders-worker"
+	consumerCount = 3
 )
 
 func InitConsumer(runner *brokers.Runner, dependencies *Dependencies) {
-	runner.Subscribe(topic, consumerGroup).
-		On(string(OrderNotificationCreate), dependencies.Handler.Create).
-		On(string(OrderNotificationUpdate), dependencies.Handler.Update).
-		On(string(OrderNotificationDelete), dependencies.Handler.Delete)
+	for i := 0; i < consumerCount; i++ {
+		runner.Subscribe(topic, consumerGroup).
+			On(string(OrderNotificationCreate), dependencies.Handler.Create).
+			On(string(OrderNotificationUpdate), dependencies.Handler.Update).
+			On(string(OrderNotificationDelete), dependencies.Handler.Delete)
+	}
 }
