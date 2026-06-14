@@ -43,71 +43,21 @@ func (h *OrderHandler) Get(ctx context.Context, req *orderspb.GetRequest) (*orde
 func (h *OrderHandler) Create(ctx context.Context, notification brokers.Notification) error {
 	var payload models.CreateOrderPayload
 	if err := json.Unmarshal(notification.Payload, &payload); err != nil {
-		log.Printf("orders consumer: skipping create with bad payload (id=%s): %v", notification.EntityID, err)
-		return nil
+		return err
 	}
 
-	err := h.service.Create(ctx, notification.EntityID, payload)
-	if err == nil {
-		return nil
-	}
-
-	if errors.Is(err, ErrInvalidOrderID) {
-		log.Printf("orders consumer: skipping create with invalid order id (id=%s): %v", notification.EntityID, err)
-		return nil
-	}
-
-	if errors.Is(err, ErrOrderNotFound) {
-		log.Printf("orders consumer: skipping create for missing order (id=%s): %v", notification.EntityID, err)
-		return nil
-	}
-
-	log.Printf("orders consumer: create failed (id=%s), will retry: %v", notification.EntityID, err)
-	return err
+	return h.service.Create(ctx, notification.EntityID, payload)
 }
 
 func (h *OrderHandler) Update(ctx context.Context, notification brokers.Notification) error {
 	var payload models.UpdateOrderPayload
 	if err := json.Unmarshal(notification.Payload, &payload); err != nil {
-		log.Printf("orders consumer: skipping update with bad payload (id=%s): %v", notification.EntityID, err)
-		return nil
+		return err
 	}
 
-	err := h.service.Update(ctx, notification.EntityID, payload)
-	if err == nil {
-		return nil
-	}
-
-	if errors.Is(err, ErrInvalidOrderID) {
-		log.Printf("orders consumer: skipping update with invalid order id (id=%s): %v", notification.EntityID, err)
-		return nil
-	}
-
-	if errors.Is(err, ErrOrderNotFound) {
-		log.Printf("orders consumer: skipping update for missing order (id=%s): %v", notification.EntityID, err)
-		return nil
-	}
-
-	log.Printf("orders consumer: update failed (id=%s), will retry: %v", notification.EntityID, err)
-	return err
+	return h.service.Update(ctx, notification.EntityID, payload)
 }
 
 func (h *OrderHandler) Delete(ctx context.Context, notification brokers.Notification) error {
-	err := h.service.Delete(ctx, notification.EntityID)
-	if err == nil {
-		return nil
-	}
-
-	if errors.Is(err, ErrInvalidOrderID) {
-		log.Printf("orders consumer: skipping delete with invalid order id (id=%s): %v", notification.EntityID, err)
-		return nil
-	}
-
-	if errors.Is(err, ErrOrderNotFound) {
-		log.Printf("orders consumer: skipping delete for missing order (id=%s): %v", notification.EntityID, err)
-		return nil
-	}
-
-	log.Printf("orders consumer: delete failed (id=%s), will retry: %v", notification.EntityID, err)
-	return err
+	return h.service.Delete(ctx, notification.EntityID)
 }

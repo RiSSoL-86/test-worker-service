@@ -53,7 +53,11 @@ func main() {
 	}
 	worker.InitGrpc(grpcServer, dependencies)
 
-	go runner.Run(ctx)
+	runnerDone := make(chan struct{})
+	go func() {
+		runner.Run(ctx)
+		close(runnerDone)
+	}()
 
 	serverErr := make(chan error, 1)
 	go func() {
@@ -70,5 +74,7 @@ func main() {
 		log.Printf("gRPC server stopped: %v", err)
 	}
 
+	stop()
 	grpcServer.GracefulStop()
+	<-runnerDone
 }

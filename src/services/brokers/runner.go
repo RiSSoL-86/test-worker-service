@@ -32,11 +32,19 @@ func (s *Subscription) dispatch(ctx context.Context, message brokers.Message) er
 
 	handler, ok := s.handlers[notification.Type]
 	if !ok {
-		log.Printf("consumer %q: skipping unknown command type %q", s.topic, notification.Type)
+		log.Printf("consumer %q: skipping unknown notification type %q", s.topic, notification.Type)
 		return nil
 	}
 
-	return handler(ctx, notification)
+	if err := handler(ctx, notification); err != nil {
+		if ctx.Err() != nil {
+			return err
+		}
+		log.Printf("consumer %q: skipping %q after error (id=%s): %v", s.topic, notification.Type, notification.EntityID, err)
+		return nil
+	}
+
+	return nil
 }
 
 type Runner struct {

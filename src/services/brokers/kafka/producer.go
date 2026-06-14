@@ -16,7 +16,7 @@ func NewProducer(settings *brokersettings.KafkaSettings) *Producer {
 	return &Producer{
 		writer: &kgo.Writer{
 			Addr:         kgo.TCP(settings.BrokerAddresses...),
-			Balancer:     &kgo.LeastBytes{},
+			Balancer:     &kgo.Hash{},
 			RequiredAcks: kgo.RequireAll,
 			Async:        false,
 		},
